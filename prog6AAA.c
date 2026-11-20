@@ -2,62 +2,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Student {
-    char usn[20], name[50], program[30], phone[15];
-    int sem;
-    struct Student *next;
+struct Employee {
+    int id;
+    char name[50], dept[30], designation[30], contact[15];
+    struct Employee *next;
 };
 
-typedef struct Student* NODE;
+typedef struct Employee* NODE;
 NODE head = NULL;
 
 // CREATE NODE
 NODE create() {
-    NODE p = malloc(sizeof(struct Student));
+    NODE p = malloc(sizeof(struct Employee));
 
     if (p == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
     }
 
-    printf("Enter USN, Name, Programme, Semester, Phone:\n");
-    scanf("%19s %49s %29s %d %14s",
-          p->usn, p->name, p->program, &p->sem, p->phone);
+    printf("Enter Employee ID: ");
+    scanf("%d", &p->id);
+
+    printf("Enter Name, Department, Designation, Contact:\n");
+    scanf("%49s %29s %29s %14s",
+          p->name, p->dept, p->designation, p->contact);
 
     p->next = NULL;
     return p;
 }
 
-// CREATE LIST (FRONT INSERTION)
-void createList(int n) {
-    NODE p;
-    for (int i = 0; i < n; i++) {
-        p = create();
-        p->next = head;
-        head = p;
-    }
-}
+// INSERT AT FRONT
+void insertFront() {
+    NODE p = create();
 
-// DISPLAY AND COUNT
-void display() {
-    NODE temp = head;
-    int count = 0;
-
-    if (head == NULL) {
-        printf("List is empty\n");
-        return;
-    }
-
-    while (temp != NULL) {
-        printf("\nUSN: %s | Name: %s | Programme: %s | Sem: %d | Phone: %s\n",
-               temp->usn, temp->name, temp->program,
-               temp->sem, temp->phone);
-
-        count++;
-        temp = temp->next;
-    }
-
-    printf("\nTotal students = %d\n", count);
+    p->next = head;
+    head = p;
 }
 
 // INSERT AT END
@@ -77,6 +56,20 @@ void insertEnd() {
     temp->next = p;
 }
 
+// DELETE AT FRONT
+void deleteFront() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    NODE temp = head;
+    head = head->next;
+
+    free(temp);
+    printf("Employee deleted\n");
+}
+
 // DELETE AT END
 void deleteEnd() {
     if (head == NULL) {
@@ -87,8 +80,9 @@ void deleteEnd() {
     NODE temp = head, prev = NULL;
 
     if (head->next == NULL) {
+        free(head);
         head = NULL;
-        free(temp);
+        printf("Employee deleted\n");
         return;
     }
 
@@ -99,62 +93,60 @@ void deleteEnd() {
 
     prev->next = NULL;
     free(temp);
-    printf("Last student deleted\n");
+
+    printf("Employee deleted\n");
 }
 
-// INSERT AT FRONT (PUSH)
-void insertFront() {
-    NODE p = create();
-    p->next = head;
-    head = p;
-}
+// DISPLAY
+void display() {
+    NODE temp = head;
+    int count = 0;
 
-// DELETE AT FRONT (POP)
-void deleteFront() {
     if (head == NULL) {
         printf("List is empty\n");
         return;
     }
 
-    NODE temp = head;
-    head = head->next;
-    free(temp);
+    while (temp != NULL) {
+        printf("\nEmployee ID: %d", temp->id);
+        printf("\nName: %s", temp->name);
+        printf("\nDepartment: %s", temp->dept);
+        printf("\nDesignation: %s", temp->designation);
+        printf("\nContact: %s\n", temp->contact);
 
-    printf("First student deleted\n");
+        count++;
+        temp = temp->next;
+    }
+
+    printf("\nTotal Employees: %d\n", count);
 }
 
 // MAIN MENU
 int main() {
-    int ch, n;
+    int ch;
 
     while (1) {
-        printf("\n--- STUDENT DATABASE ---\n");
-        printf("1. Create List\n");
-        printf("2. Display and Count\n");
-        printf("3. Insert at End\n");
+        printf("\n--- EMPLOYEE RECORD MANAGEMENT ---\n");
+        printf("1. Insert at Front\n");
+        printf("2. Insert at End\n");
+        printf("3. Delete at Front\n");
         printf("4. Delete at End\n");
-        printf("5. Insert at Front (PUSH)\n");
-        printf("6. Delete at Front (POP)\n");
-        printf("7. Exit\n");
+        printf("5. Display Employees\n");
+        printf("6. Exit\n");
 
         printf("Enter choice: ");
         scanf("%d", &ch);
 
         switch (ch) {
-            case 1:
-                printf("Enter number of students: ");
-                scanf("%d", &n);
-                if (n > 0)
-                    createList(n);
-                break;
-
-            case 2: display(); break;
-            case 3: insertEnd(); break;
+            case 1: insertFront(); break;
+            case 2: insertEnd(); break;
+            case 3: deleteFront(); break;
             case 4: deleteEnd(); break;
-            case 5: insertFront(); break;
-            case 6: deleteFront(); break;
-            case 7: exit(0);
+            case 5: display(); break;
+            case 6: exit(0);
             default: printf("Invalid choice\n");
         }
     }
+
+    return 0;
 }
